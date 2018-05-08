@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 
 using SKFormsView = SkiaSharp.Views.Forms.SKCanvasView;
@@ -30,6 +30,11 @@ using SKNativePaintSurfaceEventArgs = SkiaSharp.Views.Desktop.SKPaintSurfaceEven
 using Xamarin.Forms.Platform.GTK;
 using SKNativeView = SkiaSharp.Views.Gtk.SKWidget;
 using SKNativePaintSurfaceEventArgs = SkiaSharp.Views.Desktop.SKPaintSurfaceEventArgs;
+#elif TIZEN4_0
+using Xamarin.Forms.Platform.Tizen;
+using SKNativeView = SkiaSharp.Views.Tizen.SKCanvasView;
+using SKNativePaintSurfaceEventArgs = SkiaSharp.Views.Tizen.SKPaintSurfaceEventArgs;
+using TForms = Xamarin.Forms.Platform.Tizen.Forms;
 #endif
 
 namespace SkiaSharp.Views.Forms
@@ -113,6 +118,12 @@ namespace SkiaSharp.Views.Forms
 		{
 			return (TNativeView)Activator.CreateInstance(typeof(TNativeView), new[] { Context });
 		}
+#elif TIZEN4_0
+		protected virtual TNativeView CreateNativeControl()
+		{
+			TNativeView ret = (TNativeView)Activator.CreateInstance(typeof(TNativeView), new[] { TForms.NativeParent });
+			return ret;
+		}
 #else
 		protected virtual TNativeView CreateNativeControl()
 		{
@@ -185,6 +196,9 @@ namespace SkiaSharp.Views.Forms
 				var m = PresentationSource.FromVisual(Control).CompositionTarget.TransformToDevice;
 				x = x * m.M11;
 				y = y * m.M22;
+#elif TIZEN4_0
+				x = Tizen.ScalingInfo.FromPixel(x);
+				y = Tizen.ScalingInfo.FromPixel(y);
 #endif
 			}
 
